@@ -1,0 +1,25 @@
+import express from 'express';
+import {
+  registerController,
+  loginController,
+  logoutController,
+  refreshUserSessionController,
+} from '../controllers/auth.controller.js';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+import { validateBody } from '../middlewares/validateBody.js';
+import { createAuthSchema, loginShcema } from '../validation/auth.js';
+
+const router = express.Router();
+
+router.post(
+  '/register',
+  validateBody(createAuthSchema),
+  ctrlWrapper(registerController),
+);
+
+router.post('/login', validateBody(loginShcema), ctrlWrapper(loginController));
+
+router.post('/logout', ctrlWrapper(logoutController));
+
+router.post('/refresh', ctrlWrapper(refreshUserSessionController));
+export default router;
