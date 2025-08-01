@@ -10,6 +10,8 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { authenticate } from './middlewares/authenticate.js';
 
+import { UPLOAD_DIR } from './constants/index.js';
+
 dotenv.config();
 
 const PORT = Number(getEnvVar('PORT', '3000'));
@@ -28,6 +30,9 @@ export const setupServer = () => {
     }),
   );
   app.use(cookieParser());
+
+  app.use('/uploads', express.static(UPLOAD_DIR));
+
   app.use('/auth', authRouts);
   app.use('/contacts', authenticate, contactsRouter);
 

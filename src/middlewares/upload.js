@@ -1,0 +1,16 @@
+import multer from 'multer';
+
+import { TEMP_UPLOAD_DIR } from '../constants/index.js';
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, TEMP_UPLOAD_DIR);
+  },
+  filename: function (req, file, cb) {
+    console.log(file);
+    const uniquePrefix = Date.now();
+
+    cb(null, `${uniquePrefix}_${file.originalname}`);
+  },
+});
+export const uploadMiddleware = multer({ storage });

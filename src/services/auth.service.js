@@ -1,9 +1,21 @@
 import bcrypt from 'bcrypt';
-import { randomBytes } from 'crypto';
+import jwt from 'jsonwebtoken';
 import createHttpError from 'http-errors';
+import handlebars from 'handlebars';
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import { randomBytes } from 'crypto';
+
+import { sendEmail } from '../utils/sendMail.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
 import { User } from '../db/models/user.js';
 import { Session } from '../db/models/session.js';
-import { FIFTEEN_MINUTES, THIRTY_DAYS } from '../constants/index.js';
+import {
+  FIFTEEN_MINUTES,
+  THIRTY_DAYS,
+  SMTP,
+  TEMPLATES_DIR,
+} from '../constants/index.js';
 
 function generateRandomToken() {
   return randomBytes(30).toString('base64');
@@ -14,7 +26,7 @@ function createSession(userId) {
     userId,
     accessToken: generateRandomToken(),
     refreshToken: generateRandomToken(),
-    accessTokenValidUntill: new Date(Date.now() + FIFTEEN_MINUTES),
+    accessTokenValidUntill: new Date(Date.now() + 10 * FIFTEEN_MINUTES),
     refreshTokenValidUntill: new Date(Date.now() + THIRTY_DAYS),
   });
 }
@@ -61,3 +73,66 @@ export async function refreshUserSession(sessionId, refreshToken) {
   await Session.deleteOne({ _id: session._id });
   return createSession(session.userId);
 }
+
+// Request Password update
+export async function resetPasswordRequest(email) {
+  const user = await User.findOne({ email });
+  if (user === null) {
+    throw new createHttpError.NotFound('User not found');
+  }
+  const resetToken = jwt.sign(
+    {
+      sub: user._id,
+      name: user.name,
+    },
+    getEnvVar('JWT_SECRET'),
+    {
+      expiresIn: '15m',
+    },
+  );
+  console.log(resetToken);
+
+  const resetPasswordTemplatePath = path.join(
+    TEMPLATES_DIR,
+    'reset-password-email.hbs',
+  );
+  const templateSource = (
+    await fs.readFile(resetPasswordTemplatePath)
+  ).toString();
+
+  const template = handlebars.compile(templateSource);
+
+  const html = template({
+    name: user.name,
+    link: `${getEnvVar('APP_DOMAIN')}/reset-password?token=${resetToken}`,
+  });
+
+  await sendEmail({
+    from: getEnvVar(SMTP.SMTP_FROM),
+    to: email,
+    subject: 'Reset your password',
+    html,
+  });
+}
+// Password update
+export const resetPassword = async (token, password) => {
+  try {
+    const decoded = jwt.verify(token, getEnvVar('JWT_SECRET'));
+    const user = await User.findById(decoded.sub);
+
+    if (user === null) {
+      throw new createHttpError.NotFound('User not found');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.findByIdAndUpdate(user._id, { password: hashedPassword });
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      throw new createHttpError.Unauthorized('Token is expired');
+    }
+    if (error.name === 'JsonWebTokenError') {
+      throw new createHttpError.Unauthorized('Token is unauthorized');
+    }
+    throw error;
+  }
+};

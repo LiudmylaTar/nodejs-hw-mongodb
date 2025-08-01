@@ -14,6 +14,7 @@ import {
   createContactSchema,
   updateContactSchema,
 } from '../validation/contacts.js';
+import { uploadMiddleware } from '../middlewares/upload.js';
 
 const router = Router();
 router.get('/', ctrlWrapper(getContactsController));
@@ -22,6 +23,8 @@ router.get('/:id', isValidId, ctrlWrapper(getContactController));
 
 router.post(
   '/',
+  uploadMiddleware.single('photo'),
+
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );
@@ -29,6 +32,7 @@ router.post(
 router.delete('/:id', isValidId, ctrlWrapper(deleteContactController));
 router.patch(
   '/:id',
+  uploadMiddleware.single('photo'),
   validateBody(updateContactSchema),
   isValidId,
   ctrlWrapper(updateContactController),
