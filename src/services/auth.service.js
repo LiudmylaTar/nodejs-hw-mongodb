@@ -26,7 +26,7 @@ function createSession(userId) {
     userId,
     accessToken: generateRandomToken(),
     refreshToken: generateRandomToken(),
-    accessTokenValidUntill: new Date(Date.now() + 10 * FIFTEEN_MINUTES),
+    accessTokenValidUntill: new Date(Date.now() + FIFTEEN_MINUTES),
     refreshTokenValidUntill: new Date(Date.now() + THIRTY_DAYS),
   });
 }
