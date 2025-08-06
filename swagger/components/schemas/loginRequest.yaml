@@ -1,0 +1,13 @@
+type: object
+required:
+  - email
+  - password
+properties:
+  email:
+    description: "User's mail"
+    type: string
+    example: example@mail.com
+  password:
+    description: "Contact's user id"
+    type: string
+    example: 65e4decdd286b30065d54af9

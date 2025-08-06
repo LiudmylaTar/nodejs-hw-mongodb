@@ -1,0 +1,12 @@
+tags:
+  - Auth
+summary: Logout a user
+operationId: logoutUser
+description: Allows a user to logout and clears session cookies
+security:
+  - bearerAuth: []
+responses:
+  '204':
+    description: Successfully logged out. No content is returned.
+  '401':
+    $ref: '../../components/responses/401.yaml'

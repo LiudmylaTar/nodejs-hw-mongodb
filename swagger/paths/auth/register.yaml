@@ -1,0 +1,21 @@
+tags:
+  - Auth
+summary: Register a new user
+operationId: registerUser
+description: Allows a user to register with email and password
+security: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        $ref: '../../components/schemas/RegisterRequest.yaml'
+responses:
+  '201':
+    description: Registered a user
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/AuthResponse.yaml'
+  '401':
+    $ref: '../../components/responses/401.yaml'
