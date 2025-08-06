@@ -18,7 +18,7 @@ properties:
   phoneNumber:
     description: "Contact's phone"
     type: string
-    example: 30958465415
+    example: '30958465415'
   email:
     description: "Contact's mail"
     type: string

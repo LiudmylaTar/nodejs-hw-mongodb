@@ -11,6 +11,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { authenticate } from './middlewares/authenticate.js';
 
 import { UPLOAD_DIR } from './constants/index.js';
+import { swaggerDoc } from './middlewares/swaggerDocs.js';
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ export const setupServer = () => {
   app.use(cookieParser());
 
   app.use('/uploads', express.static(UPLOAD_DIR));
+  app.use('/api-docs', swaggerDoc());
 
   app.use('/auth', authRouts);
   app.use('/contacts', authenticate, contactsRouter);
