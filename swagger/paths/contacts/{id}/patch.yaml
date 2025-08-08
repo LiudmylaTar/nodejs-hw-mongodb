@@ -39,10 +39,6 @@ requestBody:
             type: string
             description: Contact type
             enum: [work, home, personal]
-          userId:
-            type: string
-            description: ID of the user who owns the contact
-            example: 65b0e7cd9a7b1f4b1a6f3245
           photo:
             type: string
             format: binary
