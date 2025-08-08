@@ -9,13 +9,13 @@ requestBody:
   content:
     application/json:
       schema:
-        $ref: '../../components/schemas/RegisterRequest.yaml'
+        $ref: ../../components/schemas/registerRequest.yaml
 responses:
   '201':
     description: Registered a user
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas/AuthResponse.yaml'
+          $ref: ../../components/schemas/authResponse.yaml
   '401':
     $ref: '../../components/responses/401.yaml'

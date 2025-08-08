@@ -236,9 +236,9 @@
                     "example": "f65e4decdd286b30065d54af9"
                   },
                   "photo": {
-                    "description": "Link to contact's person photo",
+                    "description": "Contact's photo",
                     "type": "string",
-                    "format": "https://res.cloudinary.com/uqwgdu/image/upload/image.png"
+                    "format": "binary"
                   }
                 }
               }
@@ -339,6 +339,120 @@
             "$ref": "#/components/responses/401"
           }
         }
+      },
+      "patch": {
+        "tags": [
+          "Contacts"
+        ],
+        "summary": "Update a contact",
+        "operationId": "updateContact",
+        "description": "Update an existing contact by ID. Fields are optional.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "65ca67e7ae7f10c88b598384"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Contact's name",
+                    "example": "Jane Smith"
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "description": "Contact's phone number",
+                    "example": "1234567890"
+                  },
+                  "email": {
+                    "type": "string",
+                    "description": "Contact's email",
+                    "example": "jane@example.com"
+                  },
+                  "isFavourite": {
+                    "type": "boolean",
+                    "description": "Whether the contact is a favourite",
+                    "example": true
+                  },
+                  "contactType": {
+                    "type": "string",
+                    "description": "Contact type",
+                    "enum": [
+                      "work",
+                      "home",
+                      "personal"
+                    ]
+                  },
+                  "userId": {
+                    "type": "string",
+                    "description": "ID of the user who owns the contact",
+                    "example": "65b0e7cd9a7b1f4b1a6f3245"
+                  },
+                  "photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Contact's photo"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully updated contact",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully patched a contact!"
+                    },
+                    "data": {
+                      "type": "object",
+                      "$ref": "#/components/schemas/contact"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "404": null,
+            "$ref": "#/components/responses/401",
+            "description": "Contact not found"
+          }
+        }
       }
     },
     "/auth/register": {
@@ -355,7 +469,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterRequest"
+                "$ref": "#/components/schemas/registerRequest"
               }
             }
           }
@@ -366,7 +480,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthResponse"
+                  "$ref": "#/components/schemas/authResponse"
                 }
               }
             }
@@ -528,7 +642,7 @@
           }
         }
       },
-      "RegisterRequest": {
+      "registerRequest": {
         "type": "object",
         "required": [
           "_id",
@@ -559,7 +673,7 @@
           }
         }
       },
-      "AuthResponse": {
+      "authResponse": {
         "type": "object",
         "required": [
           "status",
